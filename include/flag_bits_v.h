@@ -79,3 +79,7 @@ namespace enum_flags
 		(INT_VALUE | (flag_bits_v<decltype(INT_VALUE), VALUES...>)) :
 		(INT_VALUE & ~(flag_bits_v<decltype(INT_VALUE), VALUES...>));
 }
+
+#undef concept
+#undef requires
+#undef CONCEPT

@@ -8,6 +8,15 @@
 #include <cstdint>
 #include "flag_bits.h"
 
+#if __INTELLISENSE__ || !defined(_cpp_concepts)
+#define concept inline constexpr bool
+#define requires(...)
+#define CONCEPT(...) typename
+#else
+#include <concepts>
+#define CONCEPT(...) __VA_ARGS__
+#endif
+
 namespace enum_flags
 {
 	template <CONCEPT(detail::integral_or_enum) ENUM, CONCEPT(detail::bit_integral) VALUE_TYPE = uint64_t>
@@ -98,3 +107,7 @@ namespace enum_flags
 
 #undef NS
 }
+
+#undef concept
+#undef requires
+#undef CONCEPT

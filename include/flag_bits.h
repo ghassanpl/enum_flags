@@ -8,6 +8,15 @@
 #include <cstdint>
 #include "flag_bits_v.h"
 
+#if __INTELLISENSE__ || !defined(_cpp_concepts)
+#define concept inline constexpr bool
+#define requires(...)
+#define CONCEPT(...) typename
+#else
+#include <concepts>
+#define CONCEPT(...) __VA_ARGS__
+#endif
+
 namespace enum_flags
 {
 	namespace detail
@@ -63,3 +72,7 @@ namespace enum_flags
 			bits &= ~ flag_bits<INTEGRAL>(args...);
 	}
 }
+
+#undef concept
+#undef requires
+#undef CONCEPT
