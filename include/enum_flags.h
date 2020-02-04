@@ -5,7 +5,6 @@
 #pragma once
 
 #include <type_traits>
-#include <cstdint>
 #include "flag_bits.h"
 
 #if __INTELLISENSE__ || !defined(_cpp_concepts)
@@ -17,9 +16,9 @@
 #define CONCEPT(...) __VA_ARGS__
 #endif
 
-namespace enum_flags
+namespace ghassanpl
 {
-	template <CONCEPT(detail::integral_or_enum) ENUM, CONCEPT(detail::bit_integral) VALUE_TYPE = uint64_t>
+	template <CONCEPT(detail::integral_or_enum) ENUM, CONCEPT(detail::bit_integral) VALUE_TYPE = unsigned long long>
 	struct enum_flags
 	{
 		using value_type = VALUE_TYPE;

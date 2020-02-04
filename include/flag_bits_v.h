@@ -5,7 +5,6 @@
 #pragma once
 
 #include <type_traits>
-#include <cstdint>
 
 #if __INTELLISENSE__ || !defined(_cpp_concepts)
 #define concept inline constexpr bool
@@ -16,7 +15,7 @@
 #define CONCEPT(...) __VA_ARGS__
 #endif
 
-namespace enum_flags
+namespace ghassanpl
 {
 	namespace detail
 	{

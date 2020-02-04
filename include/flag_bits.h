@@ -5,7 +5,6 @@
 #pragma once
 
 #include <type_traits>
-#include <cstdint>
 #include "flag_bits_v.h"
 
 #if __INTELLISENSE__ || !defined(_cpp_concepts)
@@ -17,7 +16,7 @@
 #define CONCEPT(...) __VA_ARGS__
 #endif
 
-namespace enum_flags
+namespace ghassanpl
 {
 	namespace detail
 	{
@@ -25,7 +24,7 @@ namespace enum_flags
 		concept valid_flag_bits_arguments = detail::bit_integral<RESULT_TYPE> && (detail::integral_or_enum<ENUM_TYPES> && ...);
 	}
 
-	template <typename RESULT_TYPE = uint64_t, typename... ARGS>
+	template <typename RESULT_TYPE = unsigned long long, typename... ARGS>
 	constexpr RESULT_TYPE flag_bits(ARGS... args) noexcept
 		requires (detail::valid_flag_bits_arguments<RESULT_TYPE, ARGS...>)
 	{

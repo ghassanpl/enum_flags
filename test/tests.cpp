@@ -4,6 +4,8 @@
 /// DISCLAIMER: THE WORKS ARE WITHOUT WARRANTY.
 
 #include "../include/flag_bits_v.h"
+#include "../include/flag_bits.h"
+#include <cstdint>
 #include <gtest/gtest.h>
 
 template <typename RESULT_TYPE>
@@ -50,10 +52,12 @@ enum class UnsignedTestEnum : uint64_t
   Big = std::numeric_limits<uint64_t>::max(),
 };
 
-using namespace enum_flags;
+using namespace ghassanpl;
 
 template <class U, auto... ARGS>
-concept flag_bits_overload_exists = requires { flag_bits_v<U, ARGS...>; };
+concept flag_bits_v_overload_exists = requires { ::ghassanpl::flag_bits_v<U, ARGS...>; };
+template <class U, auto... ARGS>
+concept flag_bits_overload_exists = requires { ::ghassanpl::flag_bits<U>(std::declval<ARGS>()...); };
 
 TYPED_TEST(flag_bits_test, work_with_template_parameters)
 {
@@ -125,74 +129,74 @@ TYPED_TEST(flag_bits_test, set_to_v_works)
 
 TYPED_TEST(flag_bits_test, disallow_invalid_bit_numbers_for_template_parameters)
 {
-  EXPECT_FALSE((flag_bits_overload_exists<TypeParam, TestEnum::Negative>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<TypeParam, TestEnum::Negative>));
 
-  EXPECT_FALSE((flag_bits_overload_exists<TypeParam, TestEnum::Small>));
-  EXPECT_FALSE((flag_bits_overload_exists<TypeParam, TestEnum::Big>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<TypeParam, TestEnum::Small>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<TypeParam, TestEnum::Big>));
 
-  EXPECT_FALSE((flag_bits_overload_exists<TypeParam, UnsignedTestEnum::Big>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<TypeParam, UnsignedTestEnum::Big>));
 }
 
 TEST(flag_bits_test, disallow_invalid_bit_numbers_for_ints)
 {
-  EXPECT_TRUE ((flag_bits_overload_exists<uint8_t,  TestEnum::Seven>));
-  EXPECT_FALSE((flag_bits_overload_exists<uint8_t,  TestEnum::Eight>));
-  EXPECT_TRUE ((flag_bits_overload_exists<uint16_t, TestEnum::Nine>));
-  EXPECT_TRUE ((flag_bits_overload_exists<uint16_t, TestEnum::Fifteen>));
-  EXPECT_FALSE((flag_bits_overload_exists<uint16_t, TestEnum::Sixteen>));
-  EXPECT_TRUE ((flag_bits_overload_exists<uint32_t, TestEnum::Seventeen>));
-  EXPECT_TRUE ((flag_bits_overload_exists<uint32_t, TestEnum::ThirtyOne>));
-  EXPECT_FALSE((flag_bits_overload_exists<uint32_t, TestEnum::ThirtyTwo>));
-  EXPECT_TRUE ((flag_bits_overload_exists<uint64_t, TestEnum::ThirtyThree>));
-  EXPECT_TRUE ((flag_bits_overload_exists<uint64_t, TestEnum::SixtyThree>));
-  EXPECT_FALSE((flag_bits_overload_exists<uint64_t, TestEnum::SixtyFour>));
-  EXPECT_FALSE((flag_bits_overload_exists<uint64_t, TestEnum::SixtyFive>));
+  EXPECT_TRUE ((flag_bits_v_overload_exists<uint8_t,  TestEnum::Seven>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<uint8_t,  TestEnum::Eight>));
+  EXPECT_TRUE ((flag_bits_v_overload_exists<uint16_t, TestEnum::Nine>));
+  EXPECT_TRUE ((flag_bits_v_overload_exists<uint16_t, TestEnum::Fifteen>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<uint16_t, TestEnum::Sixteen>));
+  EXPECT_TRUE ((flag_bits_v_overload_exists<uint32_t, TestEnum::Seventeen>));
+  EXPECT_TRUE ((flag_bits_v_overload_exists<uint32_t, TestEnum::ThirtyOne>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<uint32_t, TestEnum::ThirtyTwo>));
+  EXPECT_TRUE ((flag_bits_v_overload_exists<uint64_t, TestEnum::ThirtyThree>));
+  EXPECT_TRUE ((flag_bits_v_overload_exists<uint64_t, TestEnum::SixtyThree>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<uint64_t, TestEnum::SixtyFour>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<uint64_t, TestEnum::SixtyFive>));
 
-  EXPECT_TRUE ((flag_bits_overload_exists<int8_t,   TestEnum::Seven>));
-  EXPECT_FALSE((flag_bits_overload_exists<int8_t,   TestEnum::Eight>));
-  EXPECT_TRUE ((flag_bits_overload_exists<int16_t,  TestEnum::Nine>));
-  EXPECT_TRUE ((flag_bits_overload_exists<int16_t,  TestEnum::Fifteen>));
-  EXPECT_FALSE((flag_bits_overload_exists<int16_t,  TestEnum::Sixteen>));
-  EXPECT_TRUE ((flag_bits_overload_exists<int32_t,  TestEnum::Seventeen>));
-  EXPECT_TRUE ((flag_bits_overload_exists<int32_t,  TestEnum::ThirtyOne>));
-  EXPECT_FALSE((flag_bits_overload_exists<int32_t,  TestEnum::ThirtyTwo>));
-  EXPECT_TRUE ((flag_bits_overload_exists<int64_t,  TestEnum::ThirtyThree>));
-  EXPECT_TRUE ((flag_bits_overload_exists<int64_t,  TestEnum::SixtyThree>));
-  EXPECT_FALSE((flag_bits_overload_exists<int64_t,  TestEnum::SixtyFour>));
-  EXPECT_FALSE((flag_bits_overload_exists<int64_t,  TestEnum::SixtyFive>));
+  EXPECT_TRUE ((flag_bits_v_overload_exists<int8_t,   TestEnum::Seven>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<int8_t,   TestEnum::Eight>));
+  EXPECT_TRUE ((flag_bits_v_overload_exists<int16_t,  TestEnum::Nine>));
+  EXPECT_TRUE ((flag_bits_v_overload_exists<int16_t,  TestEnum::Fifteen>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<int16_t,  TestEnum::Sixteen>));
+  EXPECT_TRUE ((flag_bits_v_overload_exists<int32_t,  TestEnum::Seventeen>));
+  EXPECT_TRUE ((flag_bits_v_overload_exists<int32_t,  TestEnum::ThirtyOne>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<int32_t,  TestEnum::ThirtyTwo>));
+  EXPECT_TRUE ((flag_bits_v_overload_exists<int64_t,  TestEnum::ThirtyThree>));
+  EXPECT_TRUE ((flag_bits_v_overload_exists<int64_t,  TestEnum::SixtyThree>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<int64_t,  TestEnum::SixtyFour>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<int64_t,  TestEnum::SixtyFive>));
 }
 
 
 TEST(flag_bits_test, disallow_non_integral_types)
 {
-  EXPECT_FALSE((flag_bits_overload_exists<bool>));
-  EXPECT_FALSE((flag_bits_overload_exists<std::nullptr_t>));
-  EXPECT_FALSE((flag_bits_overload_exists<float>));
-  EXPECT_FALSE((flag_bits_overload_exists<double>));
-  EXPECT_FALSE((flag_bits_overload_exists<long double>));
-  EXPECT_FALSE((flag_bits_overload_exists<void>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<bool>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<std::nullptr_t>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<float>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<double>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<long double>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<void>));
 
-  EXPECT_FALSE((flag_bits_overload_exists<class _c>));
-  EXPECT_FALSE((flag_bits_overload_exists<union _u>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<class _c>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<union _u>));
   enum _e {};
-  EXPECT_FALSE((flag_bits_overload_exists<_e>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<_e>));
   enum class _es {};
-  EXPECT_FALSE((flag_bits_overload_exists<_es>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<_es>));
 
-  EXPECT_FALSE((flag_bits_overload_exists<int&>));
-  EXPECT_FALSE((flag_bits_overload_exists<int*>));
-  EXPECT_FALSE((flag_bits_overload_exists<int&&>));
-  EXPECT_FALSE((flag_bits_overload_exists<int(*)()>));
-  EXPECT_FALSE((flag_bits_overload_exists<int[5]>));
-  EXPECT_FALSE((flag_bits_overload_exists<int(std::string::*)>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<int&>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<int*>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<int&&>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<int(*)()>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<int[5]>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<int(std::string::*)>));
 }
 
 
 TYPED_TEST(flag_bits_test, allows_cv_types)
 {
-  EXPECT_TRUE((flag_bits_overload_exists<std::add_const_t<TypeParam>>));
-  EXPECT_TRUE((flag_bits_overload_exists<std::add_volatile_t<TypeParam>>));
-  EXPECT_TRUE((flag_bits_overload_exists<std::add_cv_t<TypeParam>>));
+  EXPECT_TRUE((flag_bits_v_overload_exists<std::add_const_t<TypeParam>>));
+  EXPECT_TRUE((flag_bits_v_overload_exists<std::add_volatile_t<TypeParam>>));
+  EXPECT_TRUE((flag_bits_v_overload_exists<std::add_cv_t<TypeParam>>));
 }
 
 int main(int argc, char** argv) {
