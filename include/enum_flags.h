@@ -4,21 +4,12 @@
 /// DISCLAIMER: THE WORKS ARE WITHOUT WARRANTY.
 #pragma once
 
-#include <type_traits>
 #include "flag_bits.h"
-
-#if __INTELLISENSE__ || !defined(_cpp_concepts)
-#define concept inline constexpr bool
-#define requires(...)
-#define CONCEPT(...) typename
-#else
-#include <concepts>
-#define CONCEPT(...) __VA_ARGS__
-#endif
+#include <bit>
 
 namespace ghassanpl
 {
-	template <CONCEPT(detail::integral_or_enum) ENUM, CONCEPT(detail::bit_integral) VALUE_TYPE = unsigned long long>
+	template <detail::integral_or_enum ENUM, detail::bit_integral VALUE_TYPE = unsigned long long>
 	struct enum_flags
 	{
 		using value_type = VALUE_TYPE;
@@ -46,6 +37,7 @@ namespace ghassanpl
 		}
 
 		constexpr static enum_flags all() noexcept { return self_type::from_bits(~VALUE_TYPE{ 0 }); }
+		constexpr static enum_flags all(enum_type last) noexcept { return self_type::from_bits(flag_bits<VALUE_TYPE>(last) | (flag_bits<VALUE_TYPE>(last) - 1)); }
 
 		constexpr bool is_set(enum_type flag) const noexcept { return (bits & flag_bits<VALUE_TYPE>(flag)) != 0; }
 
@@ -84,10 +76,13 @@ namespace ghassanpl
 		template <typename... ARGS>
 		constexpr enum_flags& set_to(bool val, ARGS... args) noexcept
 		{
-			if (val)
-				bits |= flag_bits<VALUE_TYPE>(args...);
-			else
-				bits &= ~ flag_bits<VALUE_TYPE>(args...);
+			if (val) bits |= flag_bits<VALUE_TYPE>(args...); else bits &= ~flag_bits<VALUE_TYPE>(args...);
+			return *this;
+		}
+
+		constexpr enum_flags& set_to(bool val, enum_flags other) noexcept
+		{
+			if (val) bits |= other.bits; else bits &= ~other.bits;
 			return *this;
 		}
 
@@ -102,11 +97,31 @@ namespace ghassanpl
 
 		constexpr bool operator==(enum_flags other) const noexcept { return bits == other.bits; }
 		constexpr bool operator!=(enum_flags other) const noexcept { return bits != other.bits; }
+
+		/// TODO: begin() and end(), so we can iterate over the set bits
+
+		template <typename FUNC>
+		constexpr auto for_each(FUNC&& callback) const
+		{
+			//using return_type = decltype(callback(enum_type{}));
+			using return_type = std::invoke_result_t<FUNC, enum_type>;
+			auto bitset = (std::make_unsigned_t<value_type>)bits;
+			while (bitset)
+			{
+#pragma warning(suppress: 4146)
+				const auto t = bitset & -bitset;
+				const auto r = std::countr_zero(t);
+				if constexpr (std::is_convertible_v<return_type, bool>)
+				{
+					if (auto ret = callback((enum_type)r)) return ret;
+				}
+				else
+					callback((enum_type)r);
+				bitset ^= t;
+			}
+			if constexpr (std::is_convertible_v<return_type, bool>)
+				return return_type{};
+		}
 	};
 
-#undef NS
 }
-
-#undef concept
-#undef requires
-#undef CONCEPT

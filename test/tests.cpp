@@ -5,6 +5,7 @@
 
 #include "../include/flag_bits_v.h"
 #include "../include/flag_bits.h"
+#include "../include/enum_flags.h"
 #include <cstdint>
 #include <gtest/gtest.h>
 
@@ -59,13 +60,15 @@ concept flag_bits_v_overload_exists = requires { ::ghassanpl::flag_bits_v<U, ARG
 template <class U, auto... ARGS>
 concept flag_bits_overload_exists = requires { ::ghassanpl::flag_bits<U>(std::declval<ARGS>()...); };
 
+#define EXPECT_EQ_MEH(a, b) EXPECT_EQ(uint64_t(a), uint64_t(b))
+
 TYPED_TEST(flag_bits_test, work_with_template_parameters)
 {
-  EXPECT_EQ((flag_bits_v<TypeParam>), TypeParam{ 0 });
-  EXPECT_EQ((flag_bits_v<TypeParam, TestEnum::Zero>), TypeParam{ 1 });
-  EXPECT_EQ((flag_bits_v<TypeParam, TestEnum::Zero, TestEnum::ZeroTwo>), TypeParam{ 1 });
-  EXPECT_EQ((flag_bits_v<TypeParam, TestEnum::One>), TypeParam{ 2 });
-  EXPECT_EQ((flag_bits_v<TypeParam, TestEnum::Zero, TestEnum::ZeroTwo, TestEnum::One>), TypeParam{ 3 });
+  EXPECT_EQ_MEH((flag_bits_v<TypeParam>), TypeParam{ 0 });
+  EXPECT_EQ_MEH((flag_bits_v<TypeParam, TestEnum::Zero>), TypeParam{ 1 });
+  EXPECT_EQ_MEH((flag_bits_v<TypeParam, TestEnum::Zero, TestEnum::ZeroTwo>), TypeParam{ 1 });
+  EXPECT_EQ_MEH((flag_bits_v<TypeParam, TestEnum::One>), TypeParam{ 2 });
+  EXPECT_EQ_MEH((flag_bits_v<TypeParam, TestEnum::Zero, TestEnum::ZeroTwo, TestEnum::One>), TypeParam{ 3 });
 }
 
 TYPED_TEST(flag_bits_test, is_set_v_works)
@@ -92,39 +95,39 @@ TYPED_TEST(flag_bits_test, are_any_set_v_works)
 TYPED_TEST(flag_bits_test, set_v_works)
 {
   constexpr auto one_set = flag_bits_v<TypeParam, TestEnum::One>;
-  EXPECT_EQ((set_flag_v<one_set>), one_set);
-  EXPECT_EQ((set_flag_v<one_set, TestEnum::Seven>), (flag_bits_v<TypeParam, TestEnum::Seven, TestEnum::One>));
-  EXPECT_EQ((set_flag_v<TypeParam(0), TestEnum::Seven>), (flag_bits_v<TypeParam, TestEnum::Seven>));
-  EXPECT_EQ((set_flag_v<TypeParam(0)>), (flag_bits_v<TypeParam>));
-  EXPECT_EQ((set_flag_v<one_set>), one_set);
+  EXPECT_EQ_MEH((set_flag_v<one_set>), one_set);
+  EXPECT_EQ_MEH((set_flag_v<one_set, TestEnum::Seven>), (flag_bits_v<TypeParam, TestEnum::Seven, TestEnum::One>));
+  EXPECT_EQ_MEH((set_flag_v<TypeParam(0), TestEnum::Seven>), (flag_bits_v<TypeParam, TestEnum::Seven>));
+  EXPECT_EQ_MEH((set_flag_v<TypeParam(0)>), (flag_bits_v<TypeParam>));
+  EXPECT_EQ_MEH((set_flag_v<one_set>), one_set);
 }
 
 TYPED_TEST(flag_bits_test, unset_v_works)
 {
   constexpr auto one_set = flag_bits_v<TypeParam, TestEnum::One>;
-  EXPECT_EQ((unset_flag_v<one_set>), one_set);
-  EXPECT_EQ((unset_flag_v<one_set, TestEnum::Seven>), one_set);
-  EXPECT_EQ((unset_flag_v<one_set, TestEnum::One>), TypeParam{ 0 });
+  EXPECT_EQ_MEH((unset_flag_v<one_set>), one_set);
+  EXPECT_EQ_MEH((unset_flag_v<one_set, TestEnum::Seven>), one_set);
+  EXPECT_EQ_MEH((unset_flag_v<one_set, TestEnum::One>), TypeParam{ 0 });
   constexpr auto seventyone = flag_bits_v<TypeParam, TestEnum::Seven, TestEnum::One>;
-  EXPECT_EQ((unset_flag_v<seventyone, TestEnum::One>), (flag_bits_v<TypeParam, TestEnum::Seven>));
-  EXPECT_EQ((unset_flag_v<seventyone, TestEnum::Seven>), (flag_bits_v<TypeParam, TestEnum::One>));
-  EXPECT_EQ((unset_flag_v<seventyone, TestEnum::Seven, TestEnum::One>), (flag_bits_v<TypeParam>));
-  EXPECT_EQ((unset_flag_v<seventyone, TestEnum::Zero, TestEnum::One>), (flag_bits_v<TypeParam, TestEnum::Seven>));
+  EXPECT_EQ_MEH((unset_flag_v<seventyone, TestEnum::One>), (flag_bits_v<TypeParam, TestEnum::Seven>));
+  EXPECT_EQ_MEH((unset_flag_v<seventyone, TestEnum::Seven>), (flag_bits_v<TypeParam, TestEnum::One>));
+  EXPECT_EQ_MEH((unset_flag_v<seventyone, TestEnum::Seven, TestEnum::One>), (flag_bits_v<TypeParam>));
+  EXPECT_EQ_MEH((unset_flag_v<seventyone, TestEnum::Zero, TestEnum::One>), (flag_bits_v<TypeParam, TestEnum::Seven>));
 }
 
 TYPED_TEST(flag_bits_test, toggle_v_works)
 {
   constexpr auto bits = flag_bits_v<TypeParam, TestEnum::Seven, TestEnum::One, TestEnum::Seven, TestEnum::Zero>;
   constexpr auto bits2 = flag_bits_v<TypeParam, TestEnum::Seven>;
-  EXPECT_EQ((toggle_flag_v<bits, TestEnum::Zero, TestEnum::One>), bits2);
-  EXPECT_EQ((toggle_flag_v<bits>), bits);
+  EXPECT_EQ_MEH((toggle_flag_v<bits, TestEnum::Zero, TestEnum::One>), bits2);
+  EXPECT_EQ_MEH((toggle_flag_v<bits>), bits);
 }
 
 TYPED_TEST(flag_bits_test, set_to_v_works)
 {
   constexpr auto bits = flag_bits_v<TypeParam, TestEnum::Seven, TestEnum::One, TestEnum::Seven, TestEnum::Zero>;
-  EXPECT_EQ((set_flag_to_v<bits, false, TestEnum::Seven, TestEnum::Zero>), (flag_bits_v<TypeParam, TestEnum::One>));
-  EXPECT_EQ((set_flag_to_v<(flag_bits_v<TypeParam, TestEnum::One>), true, TestEnum::Seven, TestEnum::Zero>), bits);
+  EXPECT_EQ_MEH((set_flag_to_v<bits, false, TestEnum::Seven, TestEnum::Zero>), (flag_bits_v<TypeParam, TestEnum::One>));
+  EXPECT_EQ_MEH((set_flag_to_v<(flag_bits_v<TypeParam, TestEnum::One>), true, TestEnum::Seven, TestEnum::Zero>), bits);
 }
 
 TYPED_TEST(flag_bits_test, disallow_invalid_bit_numbers_for_template_parameters)
@@ -176,8 +179,11 @@ TEST(flag_bits_test, disallow_non_integral_types)
   EXPECT_FALSE((flag_bits_v_overload_exists<long double>));
   EXPECT_FALSE((flag_bits_v_overload_exists<void>));
 
-  EXPECT_FALSE((flag_bits_v_overload_exists<class _c>));
-  EXPECT_FALSE((flag_bits_v_overload_exists<union _u>));
+  class _c {};
+  union _u {};
+
+  EXPECT_FALSE((flag_bits_v_overload_exists<_c>));
+  EXPECT_FALSE((flag_bits_v_overload_exists<_u>));
   enum _e {};
   EXPECT_FALSE((flag_bits_v_overload_exists<_e>));
   enum class _es {};
