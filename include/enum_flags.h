@@ -30,73 +30,86 @@ namespace ghassanpl
 		template <typename... ARGS>
 		constexpr enum_flags(enum_type base_value, ARGS... args) noexcept : bits(flag_bits<VALUE_TYPE>(base_value, args...)) {}
 
-		constexpr static enum_flags from_bits(value_type val) noexcept {
-			enum_flags ret;
+		[[nodiscard]]
+		constexpr static self_type from_bits(value_type val) noexcept {
+			self_type ret;
 			ret.bits = val;
 			return ret;
 		}
 
-		constexpr static enum_flags all() noexcept { return self_type::from_bits(~VALUE_TYPE{ 0 }); }
-		constexpr static enum_flags all(enum_type last) noexcept { return self_type::from_bits(flag_bits<VALUE_TYPE>(last) | (flag_bits<VALUE_TYPE>(last) - 1)); }
+		[[nodiscard]]
+		constexpr static self_type all() noexcept { return self_type::from_bits(~VALUE_TYPE{ 0 }); }
+		[[nodiscard]]
+		constexpr static self_type all(enum_type last) noexcept { return self_type::from_bits(flag_bits<VALUE_TYPE>(last) | (flag_bits<VALUE_TYPE>(last) - 1)); }
+		[[nodiscard]]
+		constexpr static self_type none() noexcept { return {}; }
 
+		[[nodiscard]]
 		constexpr bool is_set(enum_type flag) const noexcept { return (bits & flag_bits<VALUE_TYPE>(flag)) != 0; }
 
 		template <typename... ARGS>
+		[[nodiscard]]
 		constexpr bool are_any_set(ARGS... args) const noexcept
 		{
 			return (this->is_set(args) || ...);
 		}
 
 		/// are_any_set({}) is true, which is correct or not, depending on whether you want it to be correct or not :P
-		constexpr bool are_any_set(enum_flags other) const noexcept { return other.bits == 0 /* empty set */ || (bits & other.bits) != 0; }
+		[[nodiscard]]
+		constexpr bool are_any_set(self_type other) const noexcept { return other.bits == 0 /* empty set */ || (bits & other.bits) != 0; }
 
 		template <typename... ARGS>
+		[[nodiscard]]
 		constexpr bool are_all_set(ARGS... args) const noexcept
 		{
 			return (this->is_set(args) && ...);
 		}
 
-		constexpr bool are_all_set(enum_flags other) const noexcept { return (bits & other.bits) == other.bits; }
+		[[nodiscard]]
+		constexpr bool are_all_set(self_type other) const noexcept { return (bits & other.bits) == other.bits; }
 		
 		constexpr explicit operator bool() const noexcept { return bits != 0; }
+		[[nodiscard]]
 		constexpr enum_type to_enum_type() const noexcept { return (enum_type)bits; }
 
 		template <typename... ARGS>
-		constexpr enum_flags& set(ARGS... args) noexcept { bits |= flag_bits<VALUE_TYPE>(args...); return *this; }
-		constexpr enum_flags& set(enum_flags other) noexcept { bits |= other.bits; return *this; }
+		constexpr self_type& set(ARGS... args) noexcept { bits |= flag_bits<VALUE_TYPE>(args...); return *this; }
+		constexpr self_type& set(self_type other) noexcept { bits |= other.bits; return *this; }
 
 		template <typename... ARGS>
-		constexpr enum_flags& unset(ARGS... args) noexcept { bits &= ~ flag_bits<VALUE_TYPE>(args...); return *this; }
-		constexpr enum_flags& unset(enum_flags other) noexcept { bits &= ~other.bits; return *this; }
+		constexpr self_type& unset(ARGS... args) noexcept { bits &= ~ flag_bits<VALUE_TYPE>(args...); return *this; }
+		constexpr self_type& unset(self_type other) noexcept { bits &= ~other.bits; return *this; }
 
 		template <typename... ARGS>
-		constexpr enum_flags& toggle(ARGS... args) noexcept { bits ^= flag_bits<VALUE_TYPE>(args...); return *this; }
-		constexpr enum_flags& toggle(enum_flags other) noexcept { bits ^= other.bits; return *this; }
+		constexpr self_type& toggle(ARGS... args) noexcept { bits ^= flag_bits<VALUE_TYPE>(args...); return *this; }
+		constexpr self_type& toggle(self_type other) noexcept { bits ^= other.bits; return *this; }
 
 		template <typename... ARGS>
-		constexpr enum_flags& set_to(bool val, ARGS... args) noexcept
+		constexpr self_type& set_to(bool val, ARGS... args) noexcept
 		{
 			if (val) bits |= flag_bits<VALUE_TYPE>(args...); else bits &= ~flag_bits<VALUE_TYPE>(args...);
 			return *this;
 		}
 
-		constexpr enum_flags& set_to(bool val, enum_flags other) noexcept
+		constexpr self_type& set_to(bool val, self_type other) noexcept
 		{
 			if (val) bits |= other.bits; else bits &= ~other.bits;
 			return *this;
 		}
 
-		constexpr enum_flags operator+(enum_type flag) const noexcept { return self_type::from_bits(bits | flag_bits<VALUE_TYPE>(flag)); }
-		constexpr enum_flags operator-(enum_type flag) const noexcept { return self_type::from_bits(bits & ~ flag_bits<VALUE_TYPE>(flag)); }
+		[[nodiscard]]
+		constexpr self_type operator+(enum_type flag) const noexcept { return self_type::from_bits(bits | flag_bits<VALUE_TYPE>(flag)); }
+		[[nodiscard]]
+		constexpr self_type operator-(enum_type flag) const noexcept { return self_type::from_bits(bits & ~ flag_bits<VALUE_TYPE>(flag)); }
 
-		constexpr enum_flags& operator+=(enum_type flag) noexcept { bits |= flag_bits<VALUE_TYPE>(flag); return *this; }
-		constexpr enum_flags& operator-=(enum_type flag) noexcept { bits &= ~ flag_bits<VALUE_TYPE>(flag); return *this; }
+		constexpr self_type& operator+=(enum_type flag) noexcept { bits |= flag_bits<VALUE_TYPE>(flag); return *this; }
+		constexpr self_type& operator-=(enum_type flag) noexcept { bits &= ~ flag_bits<VALUE_TYPE>(flag); return *this; }
 
-		constexpr enum_flags& operator+=(enum_flags flag) noexcept { bits |= flag.bits; return *this; }
-		constexpr enum_flags& operator-=(enum_flags flag) noexcept { bits &= ~flag.bits; return *this; }
+		constexpr self_type& operator+=(self_type flag) noexcept { bits |= flag.bits; return *this; }
+		constexpr self_type& operator-=(self_type flag) noexcept { bits &= ~flag.bits; return *this; }
 
-		constexpr bool operator==(enum_flags other) const noexcept { return bits == other.bits; }
-		constexpr bool operator!=(enum_flags other) const noexcept { return bits != other.bits; }
+		constexpr bool operator==(self_type other) const noexcept { return bits == other.bits; }
+		constexpr bool operator!=(self_type other) const noexcept { return bits != other.bits; }
 
 		/// TODO: begin() and end(), so we can iterate over the set bits
 
@@ -105,11 +118,12 @@ namespace ghassanpl
 		{
 			//using return_type = decltype(callback(enum_type{}));
 			using return_type = std::invoke_result_t<FUNC, enum_type>;
-			auto bitset = (std::make_unsigned_t<value_type>)bits;
+			using bitset_type = std::make_unsigned_t<value_type>;
+			auto bitset = static_cast<bitset_type>(bits);
 			while (bitset)
 			{
 #pragma warning(suppress: 4146)
-				const auto t = bitset & -bitset;
+				const auto t = static_cast<bitset_type>(bitset & -bitset);
 				const auto r = std::countr_zero(t);
 				if constexpr (std::is_convertible_v<return_type, bool>)
 				{
