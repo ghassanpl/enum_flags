@@ -10,8 +10,18 @@ namespace ghassanpl
 {
 	namespace detail
 	{
+		template<typename T>
+		concept valid_integral = bit_integral<T> || requires (T other, int t) {
+			{ other &= t } -> bit_integral;
+			{ other ^= t } -> bit_integral;
+			{ other |= t } -> bit_integral;
+			{ other & t } -> bit_integral;
+			{ other ^ t } -> bit_integral;
+			{ other | t } -> bit_integral;
+		};
+
 		template <typename RESULT_TYPE, typename... ENUM_TYPES>
-		concept valid_flag_bits_arguments = detail::bit_integral<RESULT_TYPE> && (detail::integral_or_enum<ENUM_TYPES> && ...);
+		concept valid_flag_bits_arguments = detail::valid_integral<RESULT_TYPE> && (detail::integral_or_enum<ENUM_TYPES> && ...);
 	}
 
 	template <typename RESULT_TYPE = unsigned long long, typename... ARGS>
@@ -23,18 +33,18 @@ namespace ghassanpl
 
 	template <typename INTEGRAL, typename ENUM_TYPE>
 	requires detail::valid_flag_bits_arguments<INTEGRAL, ENUM_TYPE>
-	constexpr bool is_flag_set(INTEGRAL bits, ENUM_TYPE flag) noexcept { return (bits & flag_bits<INTEGRAL>(flag)) != 0; }
+	constexpr bool is_flag_set(INTEGRAL const& bits, ENUM_TYPE flag) noexcept { return (bits & flag_bits<INTEGRAL>(flag)) != 0; }
 
 	template <typename INTEGRAL, typename... ARGS>
 	requires detail::valid_flag_bits_arguments<INTEGRAL, ARGS>
-	constexpr bool are_any_flags_set(INTEGRAL bits, ARGS... args) noexcept
+	constexpr bool are_any_flags_set(INTEGRAL const& bits, ARGS... args) noexcept
 	{
 		return (bits & flag_bits(args...)) != 0;
 	}
 
 	template <typename INTEGRAL, typename... ARGS>
 	requires detail::valid_flag_bits_arguments<INTEGRAL, ARGS>
-	constexpr bool are_all_flags_set(INTEGRAL bits, ARGS... args) noexcept
+	constexpr bool are_all_flags_set(INTEGRAL const& bits, ARGS... args) noexcept
 	{
 		return (bits & flag_bits(args...)) == flag_bits(args...);
 	}

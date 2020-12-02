@@ -9,7 +9,7 @@
 
 namespace ghassanpl
 {
-	template <detail::integral_or_enum ENUM, detail::bit_integral VALUE_TYPE = unsigned long long>
+	template <detail::integral_or_enum ENUM, detail::valid_integral VALUE_TYPE = unsigned long long>
 	struct enum_flags
 	{
 		using value_type = VALUE_TYPE;
@@ -112,6 +112,7 @@ namespace ghassanpl
 		constexpr bool operator!=(self_type other) const noexcept { return bits != other.bits; }
 
 		/// TODO: begin() and end(), so we can iterate over the set bits
+		/// TODO: See if this would be faster with a simple loop
 
 		template <typename FUNC>
 		constexpr auto for_each(FUNC&& callback) const
