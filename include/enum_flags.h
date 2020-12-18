@@ -15,6 +15,7 @@ namespace ghassanpl
 		using value_type = VALUE_TYPE;
 		using enum_type = ENUM;
 		using self_type = enum_flags;
+		static constexpr bool enum_type_is_enum = std::is_enum_v<ENUM>;
 
 		value_type bits = 0;
 
@@ -24,11 +25,11 @@ namespace ghassanpl
 		constexpr enum_flags& operator=(const enum_flags&) noexcept = default;
 		constexpr enum_flags& operator=(enum_flags&&) noexcept = default;
 
-		constexpr enum_flags(enum_type base_value) noexcept : bits(flag_bits<VALUE_TYPE>(base_value)) {}
-		constexpr explicit enum_flags(value_type value) noexcept : bits(value) {}
+		//constexpr explicit enum_flags(value_type value) noexcept : bits(value) {}
 
-		template <typename... ARGS>
-		constexpr enum_flags(enum_type base_value, ARGS... args) noexcept : bits(flag_bits<VALUE_TYPE>(base_value, args...)) {}
+		//constexpr enum_flags(enum_type base_value) noexcept : bits(flag_bits<VALUE_TYPE>(base_value)) {}
+		template <detail::integral_or_enum... ARGS>
+		constexpr enum_flags(ARGS... args) noexcept : bits(flag_bits<VALUE_TYPE>(args...)) {}
 
 		[[nodiscard]]
 		constexpr static self_type from_bits(value_type val) noexcept {
@@ -39,15 +40,19 @@ namespace ghassanpl
 
 		[[nodiscard]]
 		constexpr static self_type all() noexcept { return self_type::from_bits(~VALUE_TYPE{ 0 }); }
+
+		template <detail::integral_or_enum T>
 		[[nodiscard]]
-		constexpr static self_type all(enum_type last) noexcept { return self_type::from_bits(flag_bits<VALUE_TYPE>(last) | (flag_bits<VALUE_TYPE>(last) - 1)); }
+		constexpr static self_type all(T last) noexcept { return self_type::from_bits(flag_bits<VALUE_TYPE>(last) | (flag_bits<VALUE_TYPE>(last) - 1)); }
+
 		[[nodiscard]]
 		constexpr static self_type none() noexcept { return {}; }
 
+		template <detail::integral_or_enum T>
 		[[nodiscard]]
-		constexpr bool is_set(enum_type flag) const noexcept { return (bits & flag_bits<VALUE_TYPE>(flag)) != 0; }
+		constexpr bool is_set(T flag) const noexcept { return (bits & flag_bits<VALUE_TYPE>(flag)) != 0; }
 
-		template <typename... ARGS>
+		template <detail::integral_or_enum... ARGS>
 		[[nodiscard]]
 		constexpr bool are_any_set(ARGS... args) const noexcept
 		{
@@ -58,7 +63,7 @@ namespace ghassanpl
 		[[nodiscard]]
 		constexpr bool are_any_set(self_type other) const noexcept { return other.bits == 0 /* empty set */ || (bits & other.bits) != 0; }
 
-		template <typename... ARGS>
+		template <detail::integral_or_enum... ARGS>
 		[[nodiscard]]
 		constexpr bool are_all_set(ARGS... args) const noexcept
 		{
@@ -72,19 +77,19 @@ namespace ghassanpl
 		[[nodiscard]]
 		constexpr enum_type to_enum_type() const noexcept { return (enum_type)bits; }
 
-		template <typename... ARGS>
+		template <detail::integral_or_enum... ARGS>
 		constexpr self_type& set(ARGS... args) noexcept { bits |= flag_bits<VALUE_TYPE>(args...); return *this; }
 		constexpr self_type& set(self_type other) noexcept { bits |= other.bits; return *this; }
 
-		template <typename... ARGS>
+		template <detail::integral_or_enum... ARGS>
 		constexpr self_type& unset(ARGS... args) noexcept { bits &= ~ flag_bits<VALUE_TYPE>(args...); return *this; }
 		constexpr self_type& unset(self_type other) noexcept { bits &= ~other.bits; return *this; }
 
-		template <typename... ARGS>
+		template <detail::integral_or_enum... ARGS>
 		constexpr self_type& toggle(ARGS... args) noexcept { bits ^= flag_bits<VALUE_TYPE>(args...); return *this; }
 		constexpr self_type& toggle(self_type other) noexcept { bits ^= other.bits; return *this; }
 
-		template <typename... ARGS>
+		template <detail::integral_or_enum... ARGS>
 		constexpr self_type& set_to(bool val, ARGS... args) noexcept
 		{
 			if (val) bits |= flag_bits<VALUE_TYPE>(args...); else bits &= ~flag_bits<VALUE_TYPE>(args...);
@@ -97,13 +102,17 @@ namespace ghassanpl
 			return *this;
 		}
 
+		template <detail::integral_or_enum T>
 		[[nodiscard]]
-		constexpr self_type operator+(enum_type flag) const noexcept { return self_type::from_bits(bits | flag_bits<VALUE_TYPE>(flag)); }
+		constexpr self_type operator+(T flag) const noexcept { return self_type::from_bits(bits | flag_bits<VALUE_TYPE>(flag)); }
+		template <detail::integral_or_enum T>
 		[[nodiscard]]
-		constexpr self_type operator-(enum_type flag) const noexcept { return self_type::from_bits(bits & ~ flag_bits<VALUE_TYPE>(flag)); }
+		constexpr self_type operator-(T flag) const noexcept { return self_type::from_bits(bits & ~ flag_bits<VALUE_TYPE>(flag)); }
 
-		constexpr self_type& operator+=(enum_type flag) noexcept { bits |= flag_bits<VALUE_TYPE>(flag); return *this; }
-		constexpr self_type& operator-=(enum_type flag) noexcept { bits &= ~ flag_bits<VALUE_TYPE>(flag); return *this; }
+		template <detail::integral_or_enum T>
+		constexpr self_type& operator+=(T flag) noexcept { bits |= flag_bits<VALUE_TYPE>(flag); return *this; }
+		template <detail::integral_or_enum T>
+		constexpr self_type& operator-=(T flag) noexcept { bits &= ~ flag_bits<VALUE_TYPE>(flag); return *this; }
 
 		constexpr self_type& operator+=(self_type flag) noexcept { bits |= flag.bits; return *this; }
 		constexpr self_type& operator-=(self_type flag) noexcept { bits &= ~flag.bits; return *this; }
